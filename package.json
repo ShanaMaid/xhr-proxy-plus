@@ -1,0 +1,34 @@
+{
+  "name": "xhr-proxy",
+  "version": "0.0.1",
+  "description": "help proxy xhr,  the same as axios interceptor",
+  "main": "build/index.js",
+  "typings": "src/index.d.ts",
+  "scripts": {
+    "build": "rm -rf ./build && tsc --outDir build/",
+    "prepublish": "npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ShanaMaid/xhr-proxy.git"
+  },
+  "keywords": [
+    "XMLHttpRequest",
+    "http",
+    "interceptor",
+    "xhr-proxy",
+    "xhr-interceptor"
+  ],
+  "author": "shanamaid",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ShanaMaid/xhr-proxy/issues"
+  },
+  "homepage": "https://github.com/ShanaMaid/xhr-proxy#readme",
+  "devDependencies": {
+    "typescript": "^3.9.7"
+  },
+  "dependencies": {
+    "query-string": "^6.13.1"
+  }
+}
