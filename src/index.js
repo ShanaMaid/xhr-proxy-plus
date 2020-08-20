@@ -15,30 +15,30 @@ const mergeHooks = (pre, next) => {
   return newHooks;
 };
 
-window.___XhrInterceptorInstance = undefined;
-export class XhrInterceptor {
+window.___XhrProxyInstance = undefined;
+export class XhrProxy {
   /**
    * 构造函数
    */
   constructor(params = {}) {
     // 单例模式，多次声明直接合并
-    if (window.___XhrInterceptorInstance) {
+    if (window.___XhrProxyInstance) {
       if (params.apiCallback) {
-        const lastApiCallback =  window.___XhrInterceptorInstance.apiCallback;
-        window.___XhrInterceptorInstance.apiCallback = (...p) => {
+        const lastApiCallback =  window.___XhrProxyInstance.apiCallback;
+        window.___XhrProxyInstance.apiCallback = (...p) => {
           lastApiCallback(...p);
           params.apiCallback(...p);
         }
       }
       if (params.beforeHooks) {
-        window.___XhrInterceptorInstance.hooks = mergeHooks(window.___XhrInterceptorInstance.hooks, params.beforeHooks)
+        window.___XhrProxyInstance.hooks = mergeHooks(window.___XhrProxyInstance.hooks, params.beforeHooks)
       }
 
       if (params.afterHooks) {
-        window.___XhrInterceptorInstance.execedHooks = mergeHooks(window.___XhrInterceptorInstance.execedHooks, params.afterHooks)
+        window.___XhrProxyInstance.execedHooks = mergeHooks(window.___XhrProxyInstance.execedHooks, params.afterHooks)
       }
     
-      return window.___XhrInterceptorInstance;
+      return window.___XhrProxyInstance;
     }
     this.XHR = window.XMLHttpRequest;
 
@@ -47,7 +47,7 @@ export class XhrInterceptor {
     this.apiCallback= params.apiCallback;
     this.init();
 
-    window.___XhrInterceptorInstance  = this;
+    window.___XhrProxyInstance  = this;
   }
 
   /**

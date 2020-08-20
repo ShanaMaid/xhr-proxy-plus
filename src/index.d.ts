@@ -13,7 +13,7 @@ export type Record = {
   responseData: Object | string;
 }
 
-export class XhrInterceptor {
+export class XhrProxy {
   /**
    * 构造函数
    */
