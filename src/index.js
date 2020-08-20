@@ -122,9 +122,13 @@ export class XhrProxy {
         params: result.query,
       });
     } else if (key === 'send') {
+      let body =  args[0];
+        try {
+          body = JSON.parse(body);
+        } catch {}
       // 记录请求的参数
       Object.assign(record, {
-        body: args[0],
+        body,
         requestStamp: Date.now(), // 请求发送时间
       });
     } else if (key === 'onreadystatechange') {
