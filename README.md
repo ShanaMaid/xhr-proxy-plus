@@ -1,25 +1,22 @@
-<h1 align='center'>xhr-proxy</h1>
+<h1 align='center'>xhr-proxy-plus</h1>
 <p align='center'>
-  <a href="https://travis-ci.com/ShanaMaid/xhr-proxy/">
-    <img src="https://travis-ci.com/ShanaMaid/xhr-proxy.svg" alt="travis ci badge">
-  </a>
-  <img src='https://img.shields.io/npm/v/xhr-proxy.svg?style=flat-square' alt="version">
-  <img src='https://img.shields.io/npm/l/xhr-proxy.svg' alt="license">
-  <img src='http://img.badgesize.io/https://unpkg.com/xhr-proxy/build/index.js?compression=gzip&label=gzip%20size:%20&style=flat-square'>
-  <img src='https://img.shields.io/npm/dt/xhr-proxy.svg?style=flat-square' alt="downloads">
-  <img src='https://img.shields.io/npm/dm/xhr-proxy.svg?style=flat-square' alt="downloads-month">
+  <img src='https://img.shields.io/npm/v/xhr-proxy-plus.svg?style=flat-square' alt="version">
+  <img src='https://img.shields.io/npm/l/xhr-proxy-plus.svg' alt="license">
+  <img src='http://img.badgesize.io/https://unpkg.com/xhr-proxy-plus/build/index.js?compression=gzip&label=gzip%20size:%20&style=flat-square'>
+  <img src='https://img.shields.io/npm/dt/xhr-proxy-plus.svg?style=flat-square' alt="downloads">
+  <img src='https://img.shields.io/npm/dm/xhr-proxy-plus.svg?style=flat-square' alt="downloads-month">
 </p>
 
 ## Install
 ```
-npm install xhr-proxy
+npm install xhr-proxy-plus
 ```
 
 ## How to use ?
 ```js
-import { XhrInterceptor } from 'xhr-proxy';
+import { XhrProxy } from 'xhr-proxy-plus';
 //  start proxy xhr
-const handle = new XhrInterceptor({
+const handle = new XhrProxy({
   beforeHooks: {
     open: (...p) => {
       console.log('xhr.open params', ...p);
