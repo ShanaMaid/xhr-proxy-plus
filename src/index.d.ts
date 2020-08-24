@@ -9,8 +9,9 @@ export type Record = {
   responsHeaders: {
     [i: string]: string,
   },
-  responseStamp: number;
-  responseData: Object | string;
+  responseStamp: number,
+  responseData: Object | string,
+  url: string,
 }
 
 export class XhrProxy {
