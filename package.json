@@ -3,6 +3,7 @@
   "version": "0.0.4",
   "description": "help proxy xhr,  the same as axios interceptor",
   "main": "build/index.js",
+  "module": "src/index.js",
   "typings": "src/index.d.ts",
   "scripts": {
     "build": "rm -rf ./build && tsc --outDir build/",
