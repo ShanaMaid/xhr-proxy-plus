@@ -133,14 +133,15 @@ export class XhrProxy {
       });
     } else if (key === 'onreadystatechange') {
       // 记录返回参数
-      if (proxyXHR.readyState === 4 && proxyXHR.status === 200) {
-        const responsHeadersString = proxyXHR.getAllResponseHeaders();
+      // readyState === 4 响应已完成；您可以获取并使用服务器的响应了
+      if (proxyXHR.readyState === 4) {
+        const responsHeadersString = proxyXHR.getAllResponseHeaders() || '';
         const responsHeaders = {};
         responsHeadersString.split('\r\n').filter(Boolean).forEach((_) => {
           const [k, v] = _.split(': ');
           responsHeaders[k] = v;
         });
-        let responseData = proxyXHR.responseText;
+        let responseData = proxyXHR.responseText || '{}';
         try {
           responseData = JSON.parse(responseData);
         } catch {}
