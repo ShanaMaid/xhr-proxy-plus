@@ -145,10 +145,12 @@ export class XhrProxy {
         try {
           responseData = JSON.parse(responseData);
         } catch {}
+        const responsStamp = Date.now();
         Object.assign(record, {
           responseData,
           responsHeaders,
-          responsStamp: Date.now(), // 请求回来的时间
+          responsStamp, // 请求回来的时间
+          costTime: responsStamp - record.requestStamp,
         });
         if (this.apiCallback) {
           this.apiCallback(record);

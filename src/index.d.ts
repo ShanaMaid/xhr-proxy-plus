@@ -10,6 +10,7 @@ export type Record = {
     [i: string]: string,
   },
   responseStamp: number,
+  costTime: number,
   responseData: Object | string,
   url: string,
 }
