@@ -15,7 +15,10 @@ const mergeHooks = (pre, next) => {
   return newHooks;
 };
 
-window.___XhrProxyInstance = undefined;
+if (!window.___XhrProxyInstance) {
+  window.___XhrProxyInstance = undefined;
+}
+
 export class XhrProxy {
   /**
    * 构造函数
