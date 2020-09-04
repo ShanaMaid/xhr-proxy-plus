@@ -3,6 +3,7 @@ export type Record = {
   method: string,
   params: Object,
   pageUrl: string,
+  canceled: boolean,
   requestHeaders: {
     [i: string]: string,
   },
