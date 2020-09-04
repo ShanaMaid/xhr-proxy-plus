@@ -94,10 +94,10 @@ export class XhrProxy {
       }
 
       // 执行方法本体
-      const res = proxyXHR._xhr[key].apply(proxyXHR._xhr, args);
+      const res = proxyXHR._xhr[key].apply(proxyXHR, args);
 
       // 方法本体执行后的钩子
-      execedHooks[key] && execedHooks[key].call(proxyXHR._xhr, args, res);
+      execedHooks[key] && execedHooks[key].call(proxyXHR, args, res);
       this.setRecord(proxyXHR, key, args, res);
 
       return res;
@@ -123,6 +123,7 @@ export class XhrProxy {
         method: args[0],
         url: result.url,
         params: result.query,
+        pageUrl: window.location.href,
       });
     } else if (key === 'send') {
       let body =  args[0];

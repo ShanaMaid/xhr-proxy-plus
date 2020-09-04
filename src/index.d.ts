@@ -2,6 +2,7 @@ export type Record = {
   body: Object | null,
   method: string,
   params: Object,
+  pageUrl: string,
   requestHeaders: {
     [i: string]: string,
   },
