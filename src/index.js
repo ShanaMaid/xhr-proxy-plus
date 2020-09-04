@@ -65,6 +65,7 @@ export class XhrProxy {
       this._xhr.__record = {
         canceled: false,
       };
+      this._xhr.__hasCallback = false;
       _this.overwrite(this);
     }
   }
@@ -94,7 +95,11 @@ export class XhrProxy {
       if (hooks[key] && (hooks[key].apply(proxyXHR._xhr, args) === false)) {
         return;
       }
-
+      // abort需要优先上报，因为内部会触发xhrState
+      if (key === 'abort') {
+        this.setRecord(proxyXHR, key, args);
+      }
+  
       // 执行方法本体
       const res = proxyXHR._xhr[key].apply(proxyXHR._xhr, args);
       this.setRecord(proxyXHR, key, args, res);
@@ -113,11 +118,24 @@ export class XhrProxy {
     Object.defineProperty(proxyXHR, key, this.setProperyDescriptor(key, proxyXHR));
   }
 
+  apiCallbackX(proxyXHR, record) {
+    const hasCallback = proxyXHR._xhr.__hasCallback;
+    if (!hasCallback && this.apiCallback) {
+      proxyXHR._xhr.__hasCallback = true;
+      this.apiCallback(record);
+    }
+   
+  }
+
   /**
    * 对请求进行记录
    */
   setRecord (proxyXHR, key, args) {
     let record = proxyXHR._xhr.__record;
+    const hasCallback = proxyXHR._xhr.__hasCallback;
+    if (hasCallback) {
+      return;
+    }
     if (key === 'open') {
       const result = queryString.parseUrl(args[1]);
       // 记录请求的方法
@@ -137,6 +155,11 @@ export class XhrProxy {
         body,
         requestStamp: Date.now(), // 请求发送时间
       });
+    }  else if (key === 'abort') {
+      Object.assign(record, {
+        canceled: true,
+      });
+      this.apiCallbackX(proxyXHR, record);
     } else if (key === 'onreadystatechange') {
       // 记录返回参数
       // readyState === 4 响应已完成；您可以获取并使用服务器的响应了
@@ -158,22 +181,13 @@ export class XhrProxy {
           responseStamp, // 请求回来的时间
           costTime: responseStamp - record.requestStamp,
         });
-        if (this.apiCallback) {
-          this.apiCallback(record);
-        }
+        this.apiCallbackX(proxyXHR, record);
       }
     } else if (key === 'setRequestHeader') {
       if (!record.requestHeaders) {
         record.requestHeaders = {};
       }
       record.requestHeaders[args[0]] = args[1];
-    } else if (key === 'abort') {
-      Object.assign(record, {
-        canceled: true,
-      });
-      if (this.apiCallback) {
-        this.apiCallback(record);
-      }
     }
   };
 
