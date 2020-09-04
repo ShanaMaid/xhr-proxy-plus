@@ -151,12 +151,12 @@ export class XhrProxy {
         try {
           responseData = JSON.parse(responseData);
         } catch {}
-        const responsStamp = Date.now();
+        const responseStamp = Date.now();
         Object.assign(record, {
           responseData,
           responsHeaders,
-          responsStamp, // 请求回来的时间
-          costTime: responsStamp - record.requestStamp,
+          responseStamp, // 请求回来的时间
+          costTime: responseStamp - record.requestStamp,
         });
         if (this.apiCallback) {
           this.apiCallback(record);
