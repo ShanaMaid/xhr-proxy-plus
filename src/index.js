@@ -180,6 +180,7 @@ export class XhrProxy {
           responsHeaders,
           responseStamp, // 请求回来的时间
           costTime: responseStamp - record.requestStamp,
+          status: proxyXHR.status,
         });
         this.apiCallbackX(proxyXHR, record);
       }
