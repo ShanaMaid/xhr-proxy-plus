@@ -97,10 +97,10 @@ export class XhrProxy {
 
       // 执行方法本体
       const res = proxyXHR._xhr[key].apply(proxyXHR._xhr, args);
+      this.setRecord(proxyXHR, key, args, res);
 
       // 方法本体执行后的钩子
       execedHooks[key] && execedHooks[key].call(proxyXHR._xhr, args, res);
-      this.setRecord(proxyXHR, key, args, res);
 
       return res;
     };
