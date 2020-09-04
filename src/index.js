@@ -62,7 +62,9 @@ export class XhrProxy {
     window.XMLHttpRequest = function () {
       this._xhr = new _this.XHR();
       // 用于记录请求的整个链路路径
-      this.__record = {};
+      this._xhr.__record = {
+        canceled: false,
+      };
       _this.overwrite(this);
     }
   }
@@ -89,15 +91,15 @@ export class XhrProxy {
   
     proxyXHR[key] = (...args) => {
       // 拦截
-      if (hooks[key] && (hooks[key].apply(proxyXHR, args) === false)) {
+      if (hooks[key] && (hooks[key].apply(proxyXHR._xhr, args) === false)) {
         return;
       }
 
       // 执行方法本体
-      const res = proxyXHR._xhr[key].apply(proxyXHR, args);
+      const res = proxyXHR._xhr[key].apply(proxyXHR._xhr, args);
 
       // 方法本体执行后的钩子
-      execedHooks[key] && execedHooks[key].call(proxyXHR, args, res);
+      execedHooks[key] && execedHooks[key].call(proxyXHR._xhr, args, res);
       this.setRecord(proxyXHR, key, args, res);
 
       return res;
@@ -115,7 +117,7 @@ export class XhrProxy {
    * 对请求进行记录
    */
   setRecord (proxyXHR, key, args) {
-    let record = proxyXHR.__record;
+    let record = proxyXHR._xhr.__record;
     if (key === 'open') {
       const result = queryString.parseUrl(args[1]);
       // 记录请求的方法
@@ -165,6 +167,13 @@ export class XhrProxy {
         record.requestHeaders = {};
       }
       record.requestHeaders[args[0]] = args[1];
+    } else if (key === 'abort') {
+      Object.assign(record, {
+        canceled: true,
+      });
+      if (this.apiCallback) {
+        this.apiCallback(record);
+      }
     }
   };
 
