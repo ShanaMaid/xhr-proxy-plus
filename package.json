@@ -30,6 +30,6 @@
     "typescript": "^3.9.7"
   },
   "dependencies": {
-    "query-string": "^6.13.1"
+    "query-string": "5.1.1"
   }
 }
