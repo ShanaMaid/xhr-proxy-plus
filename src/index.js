@@ -143,7 +143,7 @@ export class XhrProxy {
         method: args[0],
         url: result.url,
         params: result.query,
-        pageUrl: window.location.href,
+        pageUrl: encodeURIComponent(window.location.href),
       });
     } else if (key === 'send') {
       let body =  args[0];
