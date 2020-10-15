@@ -1,6 +1,6 @@
 {
   "name": "xhr-proxy-plus",
-  "version": "0.0.19",
+  "version": "0.0.20",
   "description": "help proxy xhr,  the same as axios interceptor",
   "main": "build/index.js",
   "typings": "src/index.d.ts",
