@@ -18,6 +18,11 @@ export type Record = {
   url: string,
 }
 
+export type NetworkIdleCallbackItem = {
+  idleTime: number;
+  callback: () => void;
+}
+
 export class XhrProxy {
   /**
    * 构造函数
@@ -31,4 +36,7 @@ export class XhrProxy {
    * 取消监听
    */
   unset(): void;
+
+  // 空闲回调
+  networkIdleCallback(idleTime: number): ((cb: () => void) => void)
 }

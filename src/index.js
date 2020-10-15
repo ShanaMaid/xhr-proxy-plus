@@ -19,38 +19,78 @@ if (!window.___XhrProxyInstance) {
   window.___XhrProxyInstance = undefined;
 }
 
+/**
+ * 多实例合并
+ * 把低版本的参数合并到高版本
+ */
+const mergeInstance = (high, lowParams) => {
+  // 单例模式，多次声明直接合并
+  if (high) {
+    if (lowParams.apiCallback) {
+      const lastApiCallback =  high.apiCallback;
+      high.apiCallback = (...p) => {
+        lastApiCallback(...p);
+        lowParams.apiCallback(...p);
+      }
+    }
+    if (lowParams.beforeHooks) {
+      high.hooks = mergeHooks(high.hooks, lowParams.beforeHooks)
+    }
+
+    if (lowParams.afterHooks) {
+      high.execedHooks = mergeHooks(high.execedHooks, lowParams.afterHooks)
+    }
+
+    return high;
+  }
+};
+
+/**
+ * a版本高于b则返回true，其余情况都返回false
+ */
+const versionCompare = (a, b) => {
+  if (a !== undefined && b === undefined) {
+    return true;
+  }
+  if (a > b) {
+    return true;
+  }
+  return false;
+}
+
 export class XhrProxy {
+  // 00.00.18
+  version = '000018';
+
+  lastXhrSendStamp = Date.now();
   /**
    * 构造函数
    */
   constructor(params = {}) {
-    // 单例模式，多次声明直接合并
+    // 初始化代理函数
+    const initXhrProxy = () => {
+      this.XHR = window.XMLHttpRequest;
+
+      this.hooks = params.beforeHooks || {};
+      this.execedHooks = params.afterHooks || {};
+      this.apiCallback= params.apiCallback;
+      this.init();
+  
+      window.___XhrProxyInstance  = this;
+    };
+  
     if (window.___XhrProxyInstance) {
-      if (params.apiCallback) {
-        const lastApiCallback =  window.___XhrProxyInstance.apiCallback;
-        window.___XhrProxyInstance.apiCallback = (...p) => {
-          lastApiCallback(...p);
-          params.apiCallback(...p);
-        }
+      const old = window.___XhrProxyInstance;
+      if (versionCompare(this.version, window.___XhrProxyInstance.version)) {
+        window.___XhrProxyInstance.unset();
+        initXhrProxy();
+        mergeInstance(this, old)
+      } else {
+        mergeInstance(old, params);
       }
-      if (params.beforeHooks) {
-        window.___XhrProxyInstance.hooks = mergeHooks(window.___XhrProxyInstance.hooks, params.beforeHooks)
-      }
-
-      if (params.afterHooks) {
-        window.___XhrProxyInstance.execedHooks = mergeHooks(window.___XhrProxyInstance.execedHooks, params.afterHooks)
-      }
-    
-      return window.___XhrProxyInstance;
+    } else {
+      initXhrProxy();
     }
-    this.XHR = window.XMLHttpRequest;
-
-    this.hooks = params.beforeHooks || {};
-    this.execedHooks = params.afterHooks || {};
-    this.apiCallback= params.apiCallback;
-    this.init();
-
-    window.___XhrProxyInstance  = this;
   }
 
   /**
@@ -150,6 +190,7 @@ export class XhrProxy {
         try {
           body = JSON.parse(body);
         } catch {}
+      this.lastXhrSendStamp = Date.now();
       // 记录请求的参数
       Object.assign(record, {
         body,
@@ -189,6 +230,25 @@ export class XhrProxy {
         record.requestHeaders = {};
       }
       record.requestHeaders[args[0]] = args[1];
+    }
+  };
+
+  getXhrIdleTime = () => (Date.now() - this.lastXhrSendStamp);
+
+  networkIdleCallback = (cb, idleTime = 3 * 1000) => {
+    const distance = this.getXhrIdleTime();
+    // 当前如果满足空闲时长，直接执行
+    if (distance  >= idleTime) {
+      cb();
+    } else {
+    // 如果不满足空闲时长，延迟 时长 差执行。例如空闲时间要求10s，当前看空闲6s，那么在4s后执行，如果4s后不满足，继续滞后。
+      window.setTimeout(() => {
+        if (getXhrIdleTime() >= idleTime) {
+          cb();
+        } else {
+          this.networkIdleCallback(cb, idleTime)
+        }
+      }, idleTime - distance);
     }
   };
 
