@@ -243,7 +243,7 @@ export class XhrProxy {
     } else {
     // 如果不满足空闲时长，延迟 时长 差执行。例如空闲时间要求10s，当前看空闲6s，那么在4s后执行，如果4s后不满足，继续滞后。
       window.setTimeout(() => {
-        if (getXhrIdleTime() >= idleTime) {
+        if (this.getXhrIdleTime() >= idleTime) {
           cb();
         } else {
           this.networkIdleCallback(cb, idleTime)
