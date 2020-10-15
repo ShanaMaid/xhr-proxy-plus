@@ -38,5 +38,5 @@ export class XhrProxy {
   unset(): void;
 
   // 空闲回调
-  networkIdleCallback: (cb: () => void, idleTime: number);
+  networkIdleCallback(cb: () => void, idleTime: number): void;
 }
