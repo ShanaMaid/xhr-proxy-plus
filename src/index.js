@@ -59,8 +59,8 @@ const versionCompare = (a, b) => {
 }
 
 export class XhrProxy {
-  // 00.00.18
-  version = '000018';
+  // 00.00.19
+  version = '000019';
 
   lastXhrSendStamp = Date.now();
   /**
