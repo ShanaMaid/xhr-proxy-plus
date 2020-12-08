@@ -2,12 +2,15 @@ import queryString from 'query-string';
 
 
 const mergeHooks = (pre, next) => {
-  const sumKeys = Object.keys({ ...pre , ... next });
+  const sumKeys = Object.keys({
+    ...pre,
+    ...next
+  });
   const newHooks = {};
   const passFn = () => true;
   sumKeys.forEach((_) => {
     newHooks[_] = (...p) => {
-      const preFn =  pre[_] || passFn;
+      const preFn = pre[_] || passFn;
       const nextFn = next[_] || passFn;
       return preFn(...p) && nextFn(...p);
     };
@@ -27,7 +30,7 @@ const mergeInstance = (high, lowParams) => {
   // 单例模式，多次声明直接合并
   if (high) {
     if (lowParams.apiCallback) {
-      const lastApiCallback =  high.apiCallback;
+      const lastApiCallback = high.apiCallback;
       high.apiCallback = (...p) => {
         lastApiCallback(...p);
         lowParams.apiCallback(...p);
@@ -60,7 +63,7 @@ const versionCompare = (a, b) => {
 
 export class XhrProxy {
   // 00.00.20
-  version = '000020';
+  version = '000021';
 
   lastXhrSendStamp = Date.now();
   /**
@@ -73,12 +76,12 @@ export class XhrProxy {
 
       this.hooks = params.beforeHooks || {};
       this.execedHooks = params.afterHooks || {};
-      this.apiCallback= params.apiCallback;
+      this.apiCallback = params.apiCallback;
       this.init();
-  
-      window.___XhrProxyInstance  = this;
+
+      window.___XhrProxyInstance = this;
     };
-  
+
     if (window.___XhrProxyInstance) {
       const old = window.___XhrProxyInstance;
       if (versionCompare(this.version, window.___XhrProxyInstance.version)) {
@@ -129,7 +132,7 @@ export class XhrProxy {
   overwriteMethod(key, proxyXHR) {
     let hooks = this.hooks;
     let execedHooks = this.execedHooks;
-  
+
     proxyXHR[key] = (...args) => {
       // 拦截
       if (hooks[key] && (hooks[key].apply(proxyXHR._xhr, args) === false)) {
@@ -139,7 +142,7 @@ export class XhrProxy {
       if (key === 'abort') {
         this.setRecord(proxyXHR, key, args);
       }
-  
+
       // 执行方法本体
       const res = proxyXHR._xhr[key].apply(proxyXHR._xhr, args);
       this.setRecord(proxyXHR, key, args, res);
@@ -164,13 +167,13 @@ export class XhrProxy {
       proxyXHR._xhr.__hasCallback = true;
       this.apiCallback(record);
     }
-   
+
   }
 
   /**
    * 对请求进行记录
    */
-  setRecord (proxyXHR, key, args) {
+  setRecord(proxyXHR, key, args) {
     let record = proxyXHR._xhr.__record;
     const hasCallback = proxyXHR._xhr.__hasCallback;
     if (hasCallback) {
@@ -186,17 +189,17 @@ export class XhrProxy {
         pageUrl: encodeURIComponent(window.location.href),
       });
     } else if (key === 'send') {
-      let body =  args[0];
-        try {
-          body = JSON.parse(body);
-        } catch {}
+      let body = args[0];
+      try {
+        body = JSON.parse(body);
+      } catch {}
       this.lastXhrSendStamp = Date.now();
       // 记录请求的参数
       Object.assign(record, {
         body,
         requestStamp: Date.now(), // 请求发送时间
       });
-    }  else if (key === 'abort') {
+    } else if (key === 'abort') {
       Object.assign(record, {
         canceled: true,
       });
@@ -211,9 +214,12 @@ export class XhrProxy {
           const [k, v] = _.split(': ');
           responsHeaders[k] = v;
         });
-        let responseData = proxyXHR.responseText || '{}';
+        let responseData = proxyXHR.response || proxyXHR.responseText || '{}';
+
         try {
-          responseData = JSON.parse(responseData);
+          if (typeof responseData === 'string') {
+            responseData = JSON.parse(responseData);
+          }
         } catch {}
         const responseStamp = Date.now();
         Object.assign(record, {
@@ -238,10 +244,10 @@ export class XhrProxy {
   networkIdleCallback = (cb, idleTime = 3 * 1000) => {
     const distance = this.getXhrIdleTime();
     // 当前如果满足空闲时长，直接执行
-    if (distance  >= idleTime) {
+    if (distance >= idleTime) {
       cb();
     } else {
-    // 如果不满足空闲时长，延迟 时长 差执行。例如空闲时间要求10s，当前看空闲6s，那么在4s后执行，如果4s后不满足，继续滞后。
+      // 如果不满足空闲时长，延迟 时长 差执行。例如空闲时间要求10s，当前看空闲6s，那么在4s后执行，如果4s后不满足，继续滞后。
       window.setTimeout(() => {
         if (this.getXhrIdleTime() >= idleTime) {
           cb();
@@ -263,6 +269,7 @@ export class XhrProxy {
       // 如果不是on打头的属性
       if (!key.startsWith('on')) {
         proxyXHR['__' + key] = val;
+        this._xhr[key] = val;
         return;
       }
 
