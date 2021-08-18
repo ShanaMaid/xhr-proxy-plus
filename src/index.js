@@ -63,7 +63,7 @@ const versionCompare = (a, b) => {
 
 export class XhrProxy {
   // 00.00.20
-  version = '000021';
+  version = '000022';
 
   lastXhrSendStamp = Date.now();
   /**
@@ -214,7 +214,14 @@ export class XhrProxy {
           const [k, v] = _.split(': ');
           responsHeaders[k] = v;
         });
-        let responseData = proxyXHR.response || proxyXHR.responseText || '{}';
+  
+        let responseData;
+        try {
+          //  http code 204的时候会报错
+          responseData = proxyXHR.response || proxyXHR.responseText || '{}';
+        } catch (error) {
+          responseData = '{}';
+        }
 
         try {
           if (typeof responseData === 'string') {
